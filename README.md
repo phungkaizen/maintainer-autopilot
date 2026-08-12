@@ -1,5 +1,7 @@
 # Maintainer Autopilot
 
+[Tiếng Việt](README.vi.md)
+
 **AI can write the code. Who makes sure it is safe to merge?**
 
 Maintainer Autopilot is a local-first CLI for turning maintenance tasks into **resumable, auditable AI coding pipelines** with a single-writer lock, explicit repair lineage, read-only review, deterministic verification gates, and optional GitHub PR/CI promotion.
