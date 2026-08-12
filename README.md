@@ -6,7 +6,7 @@ Maintainer Autopilot is a local-first CLI for turning maintenance tasks into **r
 
 It is designed for maintainers and vibe coders who want automation without losing track of which agent is writing, which candidate was verified, or where to resume after a failed run.
 
-> Status: **v0.1 experimental**. Use it on a branch, review every change, and keep auto-merge disabled until you trust your configuration.
+> Status: **v0.1 public beta**. Use it on a branch, review every change, and keep auto-merge disabled.
 
 ## Why this exists
 
@@ -53,65 +53,56 @@ Core rule: **one issue, one lineage, one active writer**.
 - An agent CLI. The generated config defaults to [OpenAI Codex CLI](https://developers.openai.com/codex/non-interactive-mode), but the command/args are configurable.
 - Optional: GitHub CLI (`gh`) for `promote`.
 
-## Install for development
+## Quickstart: run one local task
+
+This workflow installs the CLI from a clean clone, then runs it in a separate Git repository you want to maintain. It assumes Node.js 22, Git, and an authenticated Codex CLI are already available.
 
 ```bash
-npm install
+git clone https://github.com/phungkaizen/maintainer-autopilot.git
+cd maintainer-autopilot
+npm ci
 npm run check
 npm link
 ```
 
-Then, inside another Git repository:
+Clone or enter the repository you want to maintain. Start from a clean `main` branch; the default configuration requires that branch name and creates a new `autopilot/<task-id>` branch.
 
 ```bash
+git clone <your-repository-url> demo-repository
+cd demo-repository
+git switch main
 maintainer-autopilot init
 ```
 
-This creates:
+`init` writes the local configuration and excludes its runtime state from Git:
 
 ```text
 .maintainer-autopilot/
 └── config.json
 ```
 
-## First run
-
-Create a task prompt:
+Run one focused task. The default implementation agent can modify this repository, so use a small, reviewable request.
 
 ```bash
-cat > /tmp/task.md <<'TASK'
-Fix the failing parser regression.
-
-Requirements:
-- reproduce the bug first
-- make the smallest correct change
-- add regression coverage
-- do not change unrelated behavior
-TASK
+maintainer-autopilot run \
+  --task docs-quickstart \
+  --prompt "Improve the README wording only. Do not change runtime behavior."
 ```
 
-Run it from a **clean `main` branch**:
-
-```bash
-maintainer-autopilot run --task issue-123 --prompt-file /tmp/task.md
-```
-
-The CLI creates a task branch such as `autopilot/issue-123` before handing write access to the agent.
-
-Check state at any time:
+The CLI creates `autopilot/docs-quickstart`, gives the implementation agent workspace-write access, runs its read-only review, then runs the configured deterministic gates. Inspect the result and state:
 
 ```bash
 maintainer-autopilot status
 maintainer-autopilot status --json
 ```
 
-If review or a deterministic gate fails, the task becomes `REPAIR_REQUIRED`. Continue the same lineage:
+If review or a deterministic gate fails, the task becomes `REPAIR_REQUIRED`. Continue the same task lineage with a focused repair prompt:
 
 ```bash
 maintainer-autopilot repair --prompt "Fix only the failing test/typecheck finding. Preserve the existing candidate behavior."
 ```
 
-When all gates pass, status becomes `READY_TO_PROMOTE`.
+When all gates pass, status becomes `READY_TO_PROMOTE`. At this point you can inspect the branch, stop there, or configure the optional GitHub promotion flow below.
 
 ## Config
 
@@ -179,6 +170,18 @@ maintainer-autopilot checkpoint
 
 When the task is in `CI`, `checkpoint` verifies that the recorded PR is actually merged before moving to `CHECKPOINTED`.
 
+## v0.1 limitations
+
+This public beta deliberately keeps the operational model narrow:
+
+- It operates in the current Git worktree, not an isolated worktree. Starting a new task requires a clean configured base branch (default: `main`).
+- There is one persisted task lineage and one active writer per workspace. A stale writer lock requires a human to confirm that the original process has stopped before `unlock --force`.
+- The generated configuration invokes local agent and gate commands. The default implementation command gives Codex workspace-write access; prompts, configuration, and gate commands are operator-controlled trust boundaries.
+- Local state is ordinary JSON files. v0.1 does not provide tamper-evident, signed, or append-only audit records.
+- GitHub promotion is optional and depends on an authenticated `gh` CLI. It does not automatically discover existing PRs outside the task state, and auto-merge stays disabled unless explicitly enabled in `config.json`.
+- A failed GitHub check returns the task to `REPAIR_REQUIRED`, but the operator must supply the repair direction and review the resulting branch and PR. v0.1 does not diagnose or repair CI failures automatically.
+- There is no hosted control plane, secret collection, automatic force-push/reset/clean, or claim that AI review replaces human review.
+
 ## Recovery
 
 If the process stops, run:
@@ -194,15 +197,6 @@ maintainer-autopilot unlock --force
 ```
 
 See [docs/RECOVERY.md](docs/RECOVERY.md) before doing this on an important repository.
-
-## Non-goals for v0.1
-
-- No SaaS control plane.
-- No hidden cloud worker.
-- No automatic secret collection.
-- No automatic force-push/reset/clean.
-- No multi-writer execution.
-- No claim that AI review replaces human review.
 
 ## Roadmap
 
