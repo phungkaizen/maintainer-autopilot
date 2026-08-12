@@ -55,14 +55,11 @@ Core rule: **one issue, one lineage, one active writer**.
 
 ## Quickstart: run one local task
 
-This workflow installs the CLI from a clean clone, then runs it in a separate Git repository you want to maintain. It assumes Node.js 22, Git, and an authenticated Codex CLI are already available.
+Install the published CLI. This workflow assumes Node.js 22, Git, and an authenticated Codex CLI are already available.
 
 ```bash
-git clone https://github.com/phungkaizen/maintainer-autopilot.git
-cd maintainer-autopilot
-npm ci
-npm run check
-npm link
+npm install -g maintainer-autopilot
+maintainer-autopilot --help
 ```
 
 Clone or enter the repository you want to maintain. Start from a clean `main` branch; the default configuration requires that branch name and creates a new `autopilot/<task-id>` branch.
@@ -103,6 +100,18 @@ maintainer-autopilot repair --prompt "Fix only the failing test/typecheck findin
 ```
 
 When all gates pass, status becomes `READY_TO_PROMOTE`. At this point you can inspect the branch, stop there, or configure the optional GitHub promotion flow below.
+
+## Contributor/development setup
+
+To develop Maintainer Autopilot itself from source, clone the repository, install its dependencies, run its checks, and link the local CLI:
+
+```bash
+git clone https://github.com/phungkaizen/maintainer-autopilot.git
+cd maintainer-autopilot
+npm ci
+npm run check
+npm link
+```
 
 ## Config
 
