@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "agent": {
+    "command": "codex",
+    "args": ["exec", "--ephemeral", "--sandbox", "workspace-write", "{prompt}"],
+    "timeoutMs": 1800000
+  },
+  "review": {
+    "enabled": true,
+    "command": "codex",
+    "args": [
+      "exec",
+      "--ephemeral",
+      "--sandbox",
+      "read-only",
+      "Review the current git diff. End with exactly AUTOPILOT_REVIEW_PASS if there are no blocking findings; otherwise AUTOPILOT_REVIEW_FAIL."
+    ],
+    "timeoutMs": 900000,
+    "passPattern": "AUTOPILOT_REVIEW_PASS"
+  },
+  "gates": [
+    { "name": "lint", "command": "npm run lint", "timeoutMs": 600000 },
+    { "name": "typecheck", "command": "npm run typecheck", "timeoutMs": 600000 },
+    { "name": "test", "command": "npm test", "timeoutMs": 900000 },
+    { "name": "build", "command": "npm run build", "timeoutMs": 900000 }
+  ],
+  "github": {
+    "enabled": false,
+    "baseBranch": "main",
+    "branchPrefix": "autopilot/",
+    "autoMerge": false
+  }
+}
