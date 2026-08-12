@@ -1,0 +1,40 @@
+{
+  "name": "maintainer-autopilot",
+  "version": "0.1.0",
+  "description": "Local-first, resumable AI maintenance pipelines with single-writer safety and deterministic verification.",
+  "type": "module",
+  "bin": {
+    "maintainer-autopilot": "src/cli.js"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22 <23"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "check": "npm test && node src/cli.js --help >/dev/null"
+  },
+  "keywords": [
+    "codex",
+    "ai-agent",
+    "maintainer",
+    "github",
+    "ci",
+    "automation",
+    "open-source"
+  ],
+  "license": "MIT",
+  "author": "phungkaizen",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phungkaizen/maintainer-autopilot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/phungkaizen/maintainer-autopilot/issues"
+  },
+  "homepage": "https://github.com/phungkaizen/maintainer-autopilot#readme"
+}

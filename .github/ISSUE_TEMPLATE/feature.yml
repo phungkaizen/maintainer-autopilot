@@ -1,0 +1,22 @@
+name: Feature request
+description: Propose a maintainer workflow improvement
+title: "feat: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Maintainer problem
+      description: Describe the workflow pain before proposing a solution.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Safety and recovery impact
+      description: How should this behave on partial failure, duplicate execution, or interrupted runs?
