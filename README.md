@@ -4,7 +4,15 @@
 
 Maintainer Autopilot is a local-first CLI for turning maintenance tasks into **resumable, auditable AI coding pipelines** with a single-writer lock, explicit repair lineage, read-only review, deterministic verification gates, and optional GitHub PR/CI promotion.
 
-It is designed for maintainers and vibe coders who want automation without losing track of which agent is writing, which candidate was verified, or where to resume after a failed run.
+## Who this is for
+
+Independent developers and vibe coders who already pay for one or more AI coding tools, and do not want their maintenance workflow tied to one provider. **Use the AI access you already have. Keep the workflow when the coding tool changes.**
+
+## Why this matters
+
+The durable parts of maintenance should live outside an individual coding-agent session: task state, the writer lock, repair lineage, deterministic gates, and the GitHub lifecycle. Maintainer Autopilot keeps that execution and safety core local and provider-independent, so you can configure the agent CLI you use today without losing the task's history or controls.
+
+In v0.1, Codex is the default configurable local agent CLI. You can configure another CLI agent, but automatic quota or provider-failure detection and seamless handoff from Codex to OpenCode or another agent are roadmap work—not behavior available today.
 
 > Status: **v0.1 public beta**. Use it on a branch, review every change, and keep auto-merge disabled.
 
@@ -131,7 +139,7 @@ The default generated config uses current Codex non-interactive safety primitive
 }
 ```
 
-Replace these commands to integrate another CLI agent. The orchestrator does not require a specific model provider.
+Replace these commands to invoke another local CLI agent. The orchestrator does not require a specific model provider, but v0.1 does not automatically detect quota/provider failures or fall back between agents.
 
 Configure deterministic gates for your repository:
 
@@ -190,6 +198,8 @@ This public beta deliberately keeps the operational model narrow:
 - GitHub promotion is optional and depends on an authenticated `gh` CLI. It does not automatically discover existing PRs outside the task state, and auto-merge stays disabled unless explicitly enabled in `config.json`.
 - A failed GitHub check returns the task to `REPAIR_REQUIRED`, but the operator must supply the repair direction and review the resulting branch and PR. v0.1 does not diagnose or repair CI failures automatically.
 - There is no hosted control plane, secret collection, automatic force-push/reset/clean, or claim that AI review replaces human review.
+- v0.1 can invoke the configured local agent CLI, with Codex as the default, but it does not provide automatic quota detection, provider-failure detection, or seamless Codex-to-OpenCode/other-agent handoff.
+- It has no subscription integration, quota bypass, or automatic subscription-aware/free-local fallback policy.
 
 ## Recovery
 
@@ -214,13 +224,15 @@ See [docs/RECOVERY.md](docs/RECOVERY.md) before doing this on an important repos
 - GitHub Issue ingestion and stronger PR discovery/idempotency
 - Automated repair diagnostics from failed GitHub Actions jobs
 - OpenCode/Claude Code adapters
+- Automatic quota/provider-failure detection and seamless handoff between configured agents
+- Subscription-aware and free/local fallback policies
 - Structured JSONL audit log
 - Pluggable policy engine
 - Dashboard / remote controller as an optional layer
 
 ## Contributing
 
-Issues and PRs are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), and the architecture/safety docs.
+This is a public beta: try it on a small repository and [open an issue](https://github.com/phungkaizen/maintainer-autopilot/issues) with failures or friction you encounter. Issues and PRs are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), and the architecture/safety docs.
 
 ## License
 
